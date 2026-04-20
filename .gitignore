@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+*.db
+cannibalize.toml
+credentials.json
+token.json
+.env
+*.xlsx
+*.csv
+!tests/fixtures/*.csv
+*.md
