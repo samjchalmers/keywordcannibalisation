@@ -59,8 +59,7 @@ def import_csv(
         ]
         if missing:
             raise ValueError(
-                f"Missing columns in CSV: {', '.join(missing)}. "
-                f"Found columns: {reader.fieldnames}"
+                f"Missing columns in CSV: {', '.join(missing)}. Found columns: {reader.fieldnames}"
             )
 
         has_date = "Date" in reader.fieldnames or "date" in reader.fieldnames

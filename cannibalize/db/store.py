@@ -97,15 +97,11 @@ class Store:
                        ctr=excluded.ctr, position=excluded.position""",
                 (query, url, clicks, impressions, ctr, position, date),
             )
-            self.conn.execute(
-                "INSERT OR IGNORE INTO queries (query) VALUES (?)", (query,)
-            )
+            self.conn.execute("INSERT OR IGNORE INTO queries (query) VALUES (?)", (query,))
 
     def mark_branded(self, query: str) -> None:
         with self.conn:
-            self.conn.execute(
-                "UPDATE queries SET is_branded = 1 WHERE query = ?", (query,)
-            )
+            self.conn.execute("UPDATE queries SET is_branded = 1 WHERE query = ?", (query,))
 
     def get_queries_with_multiple_urls(
         self, min_impressions: int, min_urls: int
@@ -148,15 +144,11 @@ class Store:
         return [row["position"] for row in rows]
 
     def get_page(self, url: str) -> dict | None:
-        row = self.conn.execute(
-            "SELECT * FROM pages WHERE url = ?", (url,)
-        ).fetchone()
+        row = self.conn.execute("SELECT * FROM pages WHERE url = ?", (url,)).fetchone()
         return dict(row) if row else None
 
     def get_all_urls(self) -> list[str]:
-        rows = self.conn.execute(
-            "SELECT DISTINCT url FROM query_page_metrics"
-        ).fetchall()
+        rows = self.conn.execute("SELECT DISTINCT url FROM query_page_metrics").fetchall()
         return [row["url"] for row in rows]
 
     def get_recently_crawled_urls(self, since_iso: str) -> set[str]:
@@ -262,9 +254,7 @@ class Store:
                 "SELECT * FROM cannibalization_cases WHERE status = ?", (status,)
             ).fetchall()
         else:
-            rows = self.conn.execute(
-                "SELECT * FROM cannibalization_cases"
-            ).fetchall()
+            rows = self.conn.execute("SELECT * FROM cannibalization_cases").fetchall()
         return [_row_to_case(row) for row in rows]
 
     def mark_case_fixed(

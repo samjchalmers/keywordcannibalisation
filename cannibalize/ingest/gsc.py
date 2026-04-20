@@ -42,9 +42,7 @@ def _get_service():
                     f"GSC OAuth client secrets missing at {CLIENT_SECRETS}. "
                     f"Create a Google Cloud OAuth client and save the JSON there."
                 )
-            flow = InstalledAppFlow.from_client_secrets_file(
-                str(CLIENT_SECRETS), SCOPES
-            )
+            flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRETS), SCOPES)
             creds = flow.run_local_server(port=0)
         CREDS_DIR.mkdir(parents=True, exist_ok=True)
         TOKEN_PATH.write_text(creds.to_json())
@@ -77,19 +75,14 @@ def fetch_query_page_data(
         }
         for attempt in range(MAX_ATTEMPTS):
             try:
-                resp = (
-                    service.searchanalytics()
-                    .query(siteUrl=site_url, body=body)
-                    .execute()
-                )
+                resp = service.searchanalytics().query(siteUrl=site_url, body=body).execute()
                 break
             except HttpError as e:
                 status = getattr(e.resp, "status", None)
                 transient = status in (429, 500, 502, 503, 504)
                 if not transient or attempt == MAX_ATTEMPTS - 1:
                     raise RuntimeError(
-                        f"GSC API error {status}: {e}. "
-                        f"Check credentials, scopes, and site URL."
+                        f"GSC API error {status}: {e}. Check credentials, scopes, and site URL."
                     ) from e
                 delay = (2 ** (attempt + 1)) + random.uniform(0, 0.5)
                 log.warning(

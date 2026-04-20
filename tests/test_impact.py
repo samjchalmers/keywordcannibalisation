@@ -48,9 +48,7 @@ def test_normalization_sets_severity(populated_store, settings):
     from cannibalize.detect.cluster import find_cannibalization_candidates
 
     clusters = find_cannibalization_candidates(populated_store, settings)
-    scored = [
-        (c, score_impact(c, populated_store, settings)) for c in clusters
-    ]
+    scored = [(c, score_impact(c, populated_store, settings)) for c in clusters]
     normalize_scores(scored, settings)
     for _, impact in scored:
         assert 0.0 <= impact.severity <= 1.0

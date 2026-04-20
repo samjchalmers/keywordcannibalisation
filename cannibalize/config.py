@@ -12,16 +12,28 @@ class Settings:
     min_urls_per_query: int = 2
     brand_terms: list[str] = field(default_factory=list)
     similarity_threshold: float = 0.3
-    severity_weights: dict[str, float] = field(default_factory=lambda: {
-        "volatility": 0.3,
-        "click_dilution": 0.4,
-        "impression_volume": 0.2,
-        "similarity": 0.1,
-    })
-    ctr_curve: list[float] = field(default_factory=lambda: [
-        0.319, 0.246, 0.185, 0.133, 0.095,
-        0.065, 0.047, 0.035, 0.030, 0.026,
-    ])
+    severity_weights: dict[str, float] = field(
+        default_factory=lambda: {
+            "volatility": 0.3,
+            "click_dilution": 0.4,
+            "impression_volume": 0.2,
+            "similarity": 0.1,
+        }
+    )
+    ctr_curve: list[float] = field(
+        default_factory=lambda: [
+            0.319,
+            0.246,
+            0.185,
+            0.133,
+            0.095,
+            0.065,
+            0.047,
+            0.035,
+            0.030,
+            0.026,
+        ]
+    )
 
     @classmethod
     def load(cls, path: Path | None = None) -> Settings:
@@ -44,9 +56,7 @@ class Settings:
             elif isinstance(val, str):
                 scalar_lines.append(f'{key} = "{val}"')
             elif isinstance(val, list):
-                formatted = ", ".join(
-                    f'"{v}"' if isinstance(v, str) else str(v) for v in val
-                )
+                formatted = ", ".join(f'"{v}"' if isinstance(v, str) else str(v) for v in val)
                 scalar_lines.append(f"{key} = [{formatted}]")
             else:
                 scalar_lines.append(f"{key} = {val}")

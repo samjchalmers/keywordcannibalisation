@@ -32,4 +32,6 @@ jobs:
       - name: Set up Python
         run: uv python install 3.11
       - name: pip-audit
-        run: uvx pip-audit -r <(uv export --no-hashes --no-dev)
+        run: |
+          uv export --no-hashes --no-dev > /tmp/requirements.txt
+          uvx pip-audit -r /tmp/requirements.txt

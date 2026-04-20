@@ -18,9 +18,7 @@ def run_detection(store: Store, settings: Settings) -> list[CannibalizationCase]
     for cluster in clusters:
         similarities[cluster.query] = score_similarity(cluster, store)
 
-    scored: list = [
-        (cluster, score_impact(cluster, store, settings)) for cluster in clusters
-    ]
+    scored: list = [(cluster, score_impact(cluster, store, settings)) for cluster in clusters]
 
     normalize_scores(scored, settings, similarities=similarities)
 

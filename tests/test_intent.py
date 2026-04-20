@@ -21,12 +21,18 @@ def test_similarity_returns_none_when_uncrawled(store):
 
 def test_similarity_scores_crawled_pages(store):
     store.upsert_page(
-        "https://x.com/a", "Running shoes", "Best running shoes",
-        None, "best running shoes for marathon training and long runs"
+        "https://x.com/a",
+        "Running shoes",
+        "Best running shoes",
+        None,
+        "best running shoes for marathon training and long runs",
     )
     store.upsert_page(
-        "https://x.com/b", "Running shoes guide", "Running shoes guide",
-        None, "guide to choosing running shoes for marathon and training"
+        "https://x.com/b",
+        "Running shoes guide",
+        "Running shoes guide",
+        None,
+        "guide to choosing running shoes for marathon and training",
     )
     cluster = QueryCluster(
         query="q",

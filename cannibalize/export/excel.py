@@ -92,14 +92,10 @@ def export_cases_excel(
         summary.append([t, n])
     summary.append([])
     summary.append(["Top 10 by severity"])
-    top = sorted(
-        cases, key=lambda c: c.severity_score or 0.0, reverse=True
-    )[:10]
+    top = sorted(cases, key=lambda c: c.severity_score or 0.0, reverse=True)[:10]
     summary.append(["query", "case_type", "severity", "click_loss"])
     for c in top:
-        summary.append(
-            [c.query, c.case_type, c.severity_score, c.estimated_click_loss]
-        )
+        summary.append([c.query, c.case_type, c.severity_score, c.estimated_click_loss])
     summary.column_dimensions["A"].width = 40
     summary.column_dimensions["B"].width = 20
 
@@ -116,14 +112,10 @@ def export_cases_excel(
     fixed_cases = [c for c in cases if c.status == "fixed"]
     if fixed_cases:
         ws_fix = wb.create_sheet("Fix Results")
-        ws_fix.append(
-            ["id", "query", "case_type", "fixed_at", "recommendation"]
-        )
+        ws_fix.append(["id", "query", "case_type", "fixed_at", "recommendation"])
         for cell in ws_fix[1]:
             cell.font = Font(bold=True)
         for c in fixed_cases:
-            ws_fix.append(
-                [c.id, c.query, c.case_type, c.fixed_at, c.recommendation]
-            )
+            ws_fix.append([c.id, c.query, c.case_type, c.fixed_at, c.recommendation])
 
     wb.save(path)

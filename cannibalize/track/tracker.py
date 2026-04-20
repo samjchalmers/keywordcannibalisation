@@ -37,9 +37,7 @@ def mark_fixed(case_id: int, store: Store) -> None:
     store.mark_case_fixed(case_id, clicks, position, ctr)
 
 
-def measure_impact(
-    case_id: int, store: Store, days_after: int = 28
-) -> FixResult | None:
+def measure_impact(case_id: int, store: Store, days_after: int = 28) -> FixResult | None:
     case = store.get_case(case_id)
     if case is None or case.fixed_at is None:
         return None
@@ -50,21 +48,13 @@ def measure_impact(
     before_end = (fixed_date - timedelta(days=1)).isoformat()
     before_start = (fixed_date - timedelta(days=days_after)).isoformat()
 
-    before = store.get_query_metrics_summary(
-        case.query, since=before_start, until=before_end
-    )
-    after = store.get_query_metrics_summary(
-        case.query, since=after_start, until=after_end
-    )
+    before = store.get_query_metrics_summary(case.query, since=before_start, until=before_end)
+    after = store.get_query_metrics_summary(case.query, since=after_start, until=after_end)
 
     clicks_before, _, pos_before, ctr_before = _aggregate(before)
     clicks_after, _, pos_after, ctr_after = _aggregate(after)
 
-    delta_pct = (
-        ((clicks_after - clicks_before) / clicks_before * 100.0)
-        if clicks_before
-        else 0.0
-    )
+    delta_pct = ((clicks_after - clicks_before) / clicks_before * 100.0) if clicks_before else 0.0
 
     store.save_fix_measurement(
         case_id,

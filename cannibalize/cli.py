@@ -112,9 +112,7 @@ def ingest_csv(
 @ingest_app.command("gsc")
 def ingest_gsc_cmd(
     site_url: str,
-    start_date: str = typer.Option(
-        None, help="Start date YYYY-MM-DD (default: 90d ago)"
-    ),
+    start_date: str = typer.Option(None, help="Start date YYYY-MM-DD (default: 90d ago)"),
     end_date: str = typer.Option(None, help="End date YYYY-MM-DD (default: today)"),
 ) -> None:
     """Fetch data from the Google Search Console API."""
@@ -212,21 +210,11 @@ def report(
         typer.echo("No cases found. Run `cannibalize detect` first.")
         return
 
-    typer.echo(
-        f"{'ID':<4} {'TYPE':<18} {'SEV':<6} {'LOSS':<8} QUERY"
-    )
-    for c in sorted(
-        cases, key=lambda x: x.severity_score or 0.0, reverse=True
-    ):
+    typer.echo(f"{'ID':<4} {'TYPE':<18} {'SEV':<6} {'LOSS':<8} QUERY")
+    for c in sorted(cases, key=lambda x: x.severity_score or 0.0, reverse=True):
         sev = f"{c.severity_score:.2f}" if c.severity_score is not None else "-"
-        loss = (
-            f"{c.estimated_click_loss:.0f}"
-            if c.estimated_click_loss is not None
-            else "-"
-        )
-        typer.echo(
-            f"{c.id:<4} {(c.case_type or '-'):<18} {sev:<6} {loss:<8} {c.query}"
-        )
+        loss = f"{c.estimated_click_loss:.0f}" if c.estimated_click_loss is not None else "-"
+        typer.echo(f"{c.id:<4} {(c.case_type or '-'):<18} {sev:<6} {loss:<8} {c.query}")
 
 
 @app.command()
@@ -286,9 +274,7 @@ def measure(
         store.close()
 
     if result is None:
-        typer.echo(
-            f"Case {case_id} has no fix recorded, or was not found.", err=True
-        )
+        typer.echo(f"Case {case_id} has no fix recorded, or was not found.", err=True)
         raise typer.Exit(1)
 
     typer.echo(
@@ -321,8 +307,7 @@ def config_set(key: str, value: str) -> None:
     current = getattr(settings, key)
     if isinstance(current, dict):
         typer.echo(
-            f"'{key}' is a dict config. Edit cannibalize.toml directly "
-            f"to change its keys.",
+            f"'{key}' is a dict config. Edit cannibalize.toml directly to change its keys.",
             err=True,
         )
         raise typer.Exit(1)

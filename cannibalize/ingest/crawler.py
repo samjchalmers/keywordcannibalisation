@@ -28,9 +28,7 @@ class RobotsCache:
         parts = urlsplit(url)
         host_key = f"{parts.scheme}://{parts.netloc}"
         if host_key not in self._parsers:
-            robots_url = urlunsplit(
-                (parts.scheme, parts.netloc, "/robots.txt", "", "")
-            )
+            robots_url = urlunsplit((parts.scheme, parts.netloc, "/robots.txt", "", ""))
             try:
                 r = await client.get(robots_url, timeout=REQUEST_TIMEOUT)
                 if 200 <= r.status_code < 300 and r.text:
@@ -49,7 +47,7 @@ class RobotsCache:
 
 
 async def _backoff_sleep(attempt: int) -> None:
-    delay = (2 ** attempt) + random.uniform(0, 0.5)
+    delay = (2**attempt) + random.uniform(0, 0.5)
     await asyncio.sleep(delay)
 
 
@@ -69,9 +67,7 @@ async def _fetch_one(
         last_err = "unknown"
         for attempt in range(MAX_ATTEMPTS):
             try:
-                r = await client.get(
-                    url, timeout=REQUEST_TIMEOUT, follow_redirects=True
-                )
+                r = await client.get(url, timeout=REQUEST_TIMEOUT, follow_redirects=True)
                 if r.status_code in TRANSIENT_STATUSES:
                     last_err = f"HTTP {r.status_code}"
                     if attempt < MAX_ATTEMPTS - 1:
@@ -129,10 +125,7 @@ async def crawl_urls(
 
     headers = {"User-Agent": user_agent}
     async with httpx.AsyncClient(headers=headers) as client:
-        tasks = [
-            asyncio.create_task(_fetch_one(client, url, semaphore, robots))
-            for url in urls
-        ]
+        tasks = [asyncio.create_task(_fetch_one(client, url, semaphore, robots)) for url in urls]
         try:
             for coro in asyncio.as_completed(tasks):
                 url, html, status = await coro
