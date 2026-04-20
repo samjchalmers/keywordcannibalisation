@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import csv
+import logging
 from datetime import date
 from pathlib import Path
 
 from cannibalize.db.store import Store
+
+log = logging.getLogger(__name__)
 
 DEFAULT_COLUMNS = {
     "query": "Top queries",
@@ -15,6 +18,13 @@ DEFAULT_COLUMNS = {
     "position": "Position",
     "date": "Date",
 }
+
+BATCH_SIZE = 1000
+
+
+def _parse_ctr(raw: str) -> float:
+    val = float(raw.strip().rstrip("%"))
+    return val / 100 if val > 1 else val
 
 
 def import_csv(
@@ -56,25 +66,37 @@ def import_csv(
         has_date = "Date" in reader.fieldnames or "date" in reader.fieldnames
         date_col = "Date" if "Date" in reader.fieldnames else "date"
         today = date.today().isoformat()
+
+        batch: list[tuple[str, str, float, float, float, float, str]] = []
         count = 0
+        skipped = 0
 
-        for row in reader:
-            ctr_raw = row[col_map["ctr"]].strip().rstrip("%")
-            ctr_val = float(ctr_raw)
-            if ctr_val > 1:
-                ctr_val = ctr_val / 100
+        for lineno, row in enumerate(reader, start=2):
+            try:
+                record = (
+                    row[col_map["query"]].strip(),
+                    row[col_map["url"]].strip(),
+                    float(row[col_map["clicks"]]),
+                    float(row[col_map["impressions"]]),
+                    _parse_ctr(row[col_map["ctr"]]),
+                    float(row[col_map["position"]]),
+                    row[date_col].strip() if has_date else today,
+                )
+            except (ValueError, KeyError) as e:
+                log.warning("skipping row %d: %s", lineno, e)
+                skipped += 1
+                continue
 
-            row_date = row[date_col].strip() if has_date else today
+            batch.append(record)
+            if len(batch) >= BATCH_SIZE:
+                store.bulk_upsert_query_page_metrics(batch)
+                count += len(batch)
+                batch.clear()
 
-            store.upsert_query_page_metrics(
-                query=row[col_map["query"]].strip(),
-                url=row[col_map["url"]].strip(),
-                clicks=float(row[col_map["clicks"]]),
-                impressions=float(row[col_map["impressions"]]),
-                ctr=ctr_val,
-                position=float(row[col_map["position"]]),
-                date=row_date,
-            )
-            count += 1
+        if batch:
+            store.bulk_upsert_query_page_metrics(batch)
+            count += len(batch)
 
+    if skipped:
+        log.warning("skipped %d malformed rows", skipped)
     return count

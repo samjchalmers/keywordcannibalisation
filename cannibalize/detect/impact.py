@@ -9,10 +9,10 @@ from cannibalize.db.store import QueryCluster, Store
 
 @dataclass
 class ImpactScore:
-    severity: float
     volatility: float
     click_loss: float
     impression_volume: float
+    severity: float | None = None
 
 
 def _std_dev(values: list[float]) -> float:
@@ -48,18 +48,11 @@ def score_impact(
     cluster: QueryCluster,
     store: Store,
     settings: Settings,
-    similarity: float | None = None,
 ) -> ImpactScore:
-    volatility = score_volatility(cluster, store)
-    click_loss = score_click_loss(cluster, settings)
-    impression_volume = sum(u.impressions for u in cluster.urls)
-    sim = similarity if similarity is not None else 0.0
-
     return ImpactScore(
-        severity=0.0,  # normalized later across all clusters
-        volatility=volatility,
-        click_loss=click_loss,
-        impression_volume=impression_volume,
+        volatility=score_volatility(cluster, store),
+        click_loss=score_click_loss(cluster, settings),
+        impression_volume=sum(u.impressions for u in cluster.urls),
     )
 
 

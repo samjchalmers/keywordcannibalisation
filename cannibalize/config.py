@@ -34,19 +34,20 @@ class Settings:
 
     def save(self, path: Path | None = None) -> None:
         config_path = path or Path("cannibalize.toml")
-        lines = []
+        scalar_lines: list[str] = []
+        section_lines: list[str] = []
         for key, val in self.__dict__.items():
-            if isinstance(val, str):
-                lines.append(f'{key} = "{val}"')
+            if isinstance(val, dict):
+                section_lines.append(f"\n[{key}]")
+                for dk, dv in val.items():
+                    section_lines.append(f"{dk} = {dv}")
+            elif isinstance(val, str):
+                scalar_lines.append(f'{key} = "{val}"')
             elif isinstance(val, list):
                 formatted = ", ".join(
                     f'"{v}"' if isinstance(v, str) else str(v) for v in val
                 )
-                lines.append(f"{key} = [{formatted}]")
-            elif isinstance(val, dict):
-                lines.append(f"\n[{key}]")
-                for dk, dv in val.items():
-                    lines.append(f'{dk} = {dv}')
+                scalar_lines.append(f"{key} = [{formatted}]")
             else:
-                lines.append(f"{key} = {val}")
-        config_path.write_text("\n".join(lines) + "\n")
+                scalar_lines.append(f"{key} = {val}")
+        config_path.write_text("\n".join(scalar_lines + section_lines) + "\n")

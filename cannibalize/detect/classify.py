@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
-from cannibalize.db.store import QueryCluster, Store
+from cannibalize.db.store import QueryCluster
 from cannibalize.detect.impact import ImpactScore
 
 PAGE_TYPE_PATTERNS: dict[str, list[str]] = {
@@ -39,7 +39,6 @@ def classify_case(
     cluster: QueryCluster,
     similarity: float | None,
     impact: ImpactScore,
-    store: Store,
 ) -> Classification:
     keep_url = _best_performing_url(cluster)
     page_types = {u.url: _infer_page_type(u.url) for u in cluster.urls}
